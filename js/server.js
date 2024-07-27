@@ -24,8 +24,12 @@ var session = require("express-session");
 var passport = require("passport");
 var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
 var config = require("./config");
-var itemsApi = require("./js/routes/itemsApi"); 
+const listofitemsRouter = require("./routes/itemsApi");
 
+const {
+	queryDispatcher,
+	sparqlQuery,
+} = require("./controllers/SPARQLQueryDispatcher");
 
 var app = express();
 var router = express.Router();
@@ -33,7 +37,6 @@ var router = express.Router();
 app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
-
 
 app.use(
 	session({
@@ -74,6 +77,8 @@ passport.deserializeUser(function (obj, done) {
 	done(null, obj);
 });
 
+app.use("/items", listofitemsRouter);
+
 // router.get("/", function (req, res) {
 // 	res.render("index", {
 // 		user: req && req.session && req.session.user,
@@ -110,10 +115,12 @@ passport.deserializeUser(function (obj, done) {
 // 	res.redirect(req.baseUrl + "/");
 // });
 
-app.use("/items", itemsApi);
-
+// router.get("/items", (req, res) => {
+// 	const result =  queryDispatcher.query(sparqlQuery);
+// 	console.log("we are here ", Object.keys(result));
+// 	return result;
+// });
 
 app.listen(process.env.PORT || 8000, function () {
 	console.log("Node.js app listening on port 8000!");
 });
-
