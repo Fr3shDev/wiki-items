@@ -28,6 +28,8 @@ var propertiesData = require('./utils/data')
 var app = express();
 var router = express.Router();
 
+const searchRoute = require("./routes/propertyValue");
+
 app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
@@ -40,10 +42,14 @@ app.use(
 		resave: true,
 	}),
 );
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(passport.initialize());
 app.use(passport.session());
 app.use("/", router);
+
+app.use('/property-value', searchRoute);
 
 passport.use(
 	new MediaWikiStrategy(
