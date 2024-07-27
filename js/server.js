@@ -24,6 +24,8 @@ var session = require("express-session");
 var passport = require("passport");
 var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
 var config = require("./config");
+var itemsApi = require("./js/routes/itemsApi"); 
+
 
 var app = express();
 var router = express.Router();
@@ -32,8 +34,6 @@ app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
 
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use(
 	session({
@@ -42,6 +42,9 @@ app.use(
 		resave: true,
 	}),
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use("/", router);
 
@@ -71,42 +74,46 @@ passport.deserializeUser(function (obj, done) {
 	done(null, obj);
 });
 
-router.get("/", function (req, res) {
-	res.render("index", {
-		user: req && req.session && req.session.user,
-		url: req.baseUrl,
-	});
-});
+// router.get("/", function (req, res) {
+// 	res.render("index", {
+// 		user: req && req.session && req.session.user,
+// 		url: req.baseUrl,
+// 	});
+// });
 
-router.get("/login", function (req, res) {
-	res.redirect(req.baseUrl + "/oauth-callback");
-});
+// router.get("/login", function (req, res) {
+// 	res.redirect(req.baseUrl + "/oauth-callback");
+// });
 
-router.get("/oauth-callback", function (req, res, next) {
-	passport.authenticate("mediawiki", function (err, user) {
-		if (err) {
-			return next(err);
-		}
+// router.get("/oauth-callback", function (req, res, next) {
+// 	passport.authenticate("mediawiki", function (err, user) {
+// 		if (err) {
+// 			return next(err);
+// 		}
 
-		if (!user) {
-			return res.redirect(req.baseUrl + "/login");
-		}
+// 		if (!user) {
+// 			return res.redirect(req.baseUrl + "/login");
+// 		}
 
-		req.logIn(user, function (err) {
-			if (err) {
-				return next(err);
-			}
-			req.session.user = user;
-			res.redirect(req.baseUrl + "/");
-		});
-	})(req, res, next);
-});
+// 		req.logIn(user, function (err) {
+// 			if (err) {
+// 				return next(err);
+// 			}
+// 			req.session.user = user;
+// 			res.redirect(req.baseUrl + "/");
+// 		});
+// 	})(req, res, next);
+// });
 
-router.get("/logout", function (req, res) {
-	delete req.session.user;
-	res.redirect(req.baseUrl + "/");
-});
+// router.get("/logout", function (req, res) {
+// 	delete req.session.user;
+// 	res.redirect(req.baseUrl + "/");
+// });
+
+app.use("/items", itemsApi);
+
 
 app.listen(process.env.PORT || 8000, function () {
 	console.log("Node.js app listening on port 8000!");
 });
+
