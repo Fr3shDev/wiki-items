@@ -1,0 +1,24 @@
+{
+  "name": "data_classification",
+  "version": "1.0.0",
+  "description": "Classification of unclassified wikidata items",
+  "main": "server.js",
+  "scripts": {
+    "test": "dev",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "wikidata",
+    "mediawiki",
+    "wikibase"
+  ],
+  "author": "WMA Buea Cameroon",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "passport": "^0.7.0",
+    "passport-mediawiki-oauth": "^0.1.0"
+  }
+}
