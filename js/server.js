@@ -24,7 +24,7 @@ var session = require("express-session");
 var passport = require("passport");
 var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
 var config = require("./config");
-
+var propertiesData = require('./utils/data')
 var app = express();
 var router = express.Router();
 
@@ -45,6 +45,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use(passport.initialize());
+app.use(passport.session());
 app.use("/", router);
 
 app.use('/property-value', searchRoute);
@@ -110,6 +112,13 @@ router.get("/logout", function (req, res) {
 	delete req.session.user;
 	res.redirect(req.baseUrl + "/");
 });
+router.get("/properties", function (req, res) {
+	try {
+        res.json(propertiesData);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to fetch properties' });
+    } 
+})
 
 app.listen(process.env.PORT || 8000, function () {
 	console.log("Node.js app listening on port 8000!");
