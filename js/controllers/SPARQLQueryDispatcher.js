@@ -1,40 +1,53 @@
-const { query } = require("express");
+const axios = require("axios");
+const config = require("../config");
 
-class SPARQLQueryDispatcher {
-	constructor(endpoint) {
-		this.endpoint = endpoint;
+const querySPARQL = async (endpoint, query) => {
+	const fullUrl = `${endpoint}?query=${encodeURIComponent(query)}`;
+	try {
+		const response = await axios.get(fullUrl, {
+			headers: {
+				Accept: "application/sparql-results+json",
+			},
+		});
+
+		if (response.status !== 200) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		return response.data;
+	} catch (error) {
+		throw new Error(`Failed to fetch data: ${error.message}`);
 	}
-
-	query( sparqlQuery ) {
-		const fullUrl = this.endpoint + '?query=' + encodeURIComponent( sparqlQuery );
-		const headers = { 'Accept': 'application/sparql-results+json' };
-
-		return fetch( fullUrl, { headers } ).then( body => body.json() );
-	}
-}
-
-const endpointUrl = "https://query.wikidata.org/sparql";
-const sparqlQuery = `#Items with a Wikispecies sitelink
-#illustrates sitelink selection, ";" notation
-#title: Items with a Wikispecies sitelink
-SELECT ?item WHERE {
-    ?item wikibase:sitelinks [] .
-    MINUS {?item wdt:P31 []}
-    MINUS {?item wdt:P279 []}
-    MINUS {?item wdt:P361 []}
-    MINUS {?item wdt:P527 []}
-}
-LIMIT 5
-`;
-
-const queryDispatcher = new SPARQLQueryDispatcher(endpointUrl);
-console.log(queryDispatcher);
-
-const fetchItems = () => {
-	const result = queryDispatcher.query(sparqlQuery);
-	// console.log("we are here ", Promise.call(result));
-	// result.then(console.log)
-	return result;
 };
 
-module.exports = { fetchItems };
+const queryWikidata = async (ids) => {
+	const fullUrl = `${config.wikiDataUrl}?action=
+	wbgetentities&format=json&ids=${ids}&languages=en&props=claims|labels|descriptions`;
+
+	try {
+		const response = await axios.get(fullUrl, {
+			headers: {
+				Accept: "application/sparql-results+json",
+			},
+		});
+
+		if (response.status !== 200) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		return response.data;
+	} catch (error) {
+		throw new Error(`Failed to fetch data: ${error.message}`);
+	}
+};
+
+const fetchItems = async () => {
+	return await querySPARQL(config.SPARKQLEndPointUrl, config.sparqlQuery);
+};
+
+const getEntities = async (ids) => {
+	const qData = await queryWikidata(ids);
+	return qData;
+};
+
+module.exports = { fetchItems, getEntities };
