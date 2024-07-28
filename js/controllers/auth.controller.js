@@ -1,42 +1,33 @@
-router.get("/", function (req, res) {
-  res.render("index", {
-    user: req && req.session && req.session.user,
-    url: req.baseUrl,
-  });
-});
+const axios = require("axios");
+const config = require("../config");
+const qs = require("qs");
 
-router.get("/login", function (req, res) {
-  res.redirect(req.baseUrl + "/oauth-callback");
-});
+const ACCESS_TOKEN =
+  "https://meta.wikimedia.org/w/rest.php/oauth2/access_token";
 
-router.get("/oauth-callback", function (req, res, next) {
-  passport.authenticate("mediawiki", function (err, user) {
-    if (err) {
-      return next(err);
-    }
+const login = async (req, res) => {
+  const { code } = req.params;
 
-    if (!user) {
-      return res.redirect(req.baseUrl + "/login");
-    }
+  const requestBody = {
+    code: code,
+    grant_type: "authorization_code",
+    redirect_uri: config.callback,
+    client_id: config.consumer_key,
+    client_secret: config.consumer_secret,
+  };
 
-    req.logIn(user, function (err) {
-      if (err) {
-        return next(err);
-      }
-      req.session.user = user;
-      res.redirect(req.baseUrl + "/");
-    });
-  })(req, res, next);
-});
-
-router.get("/logout", function (req, res) {
-  delete req.session.user;
-  res.redirect(req.baseUrl + "/");
-});
-router.get("/properties", function (req, res) {
   try {
-    res.json(propertiesData);
+    const response = await axios.get(ACCESS_TOKEN, qs.stringify(requestBody), {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded", // Set Content-Type header
+      },
+    });
+    console.log(response);
   } catch (error) {
-    res.status(500).json({ error: "Failed to fetch properties" });
+    console.log(error);
   }
-});
+};
+
+module.exports = {
+  login,
+};

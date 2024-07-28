@@ -18,41 +18,24 @@
  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+require("dotenv").config();
 const notFound = require("./exception-handlers/not-found");
 const errorHandlerMiddleware = require("./exception-handlers/error-handler");
 var express = require("express");
-var session = require("express-session");
-var passport = require("passport");
-var config = require("./config");
-var propertiesData = require("./utils/data");
+
 var app = express();
-var router = express.Router();
 
 const searchRoute = require("./routes/propertyValue");
+const authRoute = require("./routes/auth.routes");
 
-app.set("views", __dirname + "/public/views");
-app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
 
-app.use(
-  session({
-    secret: config.session_secret,
-    saveUninitialized: true,
-    resave: true,
-  })
-);
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(passport.initialize());
-app.use(passport.session());
-app.use("/", router);
-
 app.use("/property-value", searchRoute);
+app.use("/api/v1/auth", authRoute);
 
 app.use(notFound);
 app.use(errorHandlerMiddleware);
 
-app.listen(process.env.PORT || 5000, function () {
+app.listen(process.env.PORT || 8000, function () {
   console.log("Node.js app listening on port 8000!");
 });
