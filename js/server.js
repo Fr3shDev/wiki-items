@@ -24,6 +24,13 @@ var session = require("express-session");
 var passport = require("passport");
 var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
 var config = require("./config");
+const listofitemsRouter = require("./routes/itemsApi");
+
+const {
+	queryDispatcher,
+	sparqlQuery,
+} = require("./controllers/SPARQLQueryDispatcher");
+
 var propertiesData = require('./utils/data')
 var app = express();
 var router = express.Router();
@@ -33,7 +40,6 @@ const searchRoute = require("./routes/propertyValue");
 app.set("views", __dirname + "/public/views");
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public/views"));
-
 
 app.use(
 	session({
@@ -47,6 +53,7 @@ app.use(passport.session());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use("/", router);
 
 app.use('/property-value', searchRoute);
@@ -119,6 +126,8 @@ router.get("/properties", function (req, res) {
         res.status(500).json({ error: 'Failed to fetch properties' });
     } 
 })
+
+app.use("/items", listofitemsRouter);
 
 app.listen(process.env.PORT || 8000, function () {
 	console.log("Node.js app listening on port 8000!");
