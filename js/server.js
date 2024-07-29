@@ -25,6 +25,9 @@ var express = require("express");
 
 var app = express();
 
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 const searchRoute = require("./routes/propertyValue");
 const authRoute = require("./routes/auth.routes");
 

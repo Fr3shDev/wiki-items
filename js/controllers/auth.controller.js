@@ -1,32 +1,31 @@
 const axios = require("axios");
 const config = require("../config");
 const qs = require("qs");
+const asyncHandler = require("../middleware/async-handler");
 
-const ACCESS_TOKEN =
+const ACCESS_TOKEN_URL =
   "https://meta.wikimedia.org/w/rest.php/oauth2/access_token";
 
-const login = async (req, res) => {
-  const { code } = req.params;
+const login = asyncHandler(async (req, res) => {
+  const { code } = req.body;
 
-  const requestBody = {
-    code: code,
+  const data = {
     grant_type: "authorization_code",
-    redirect_uri: config.callback,
+    code: code,
     client_id: config.consumer_key,
     client_secret: config.consumer_secret,
   };
 
-  try {
-    const response = await axios.get(ACCESS_TOKEN, qs.stringify(requestBody), {
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded", // Set Content-Type header
-      },
-    });
-    console.log(response);
-  } catch (error) {
-    console.log(error);
-  }
-};
+  const headers = {
+    "Content-Type": "application/x-www-form-urlencoded",
+  };
+
+  const response = await axios.post(ACCESS_TOKEN_URL, data, {
+    headers,
+  });
+
+  res.status(200).json(response.data);
+});
 
 module.exports = {
   login,
