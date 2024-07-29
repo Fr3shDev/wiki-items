@@ -24,24 +24,45 @@ const errorHandlerMiddleware = require("./exception-handlers/error-handler");
 var express = require("express");
 const cors = require("cors");
 
+const listofitemsRouter = require("./routes/itemsApi");
+const searchRoute = require("./routes/propertyValue");
+const authRoute = require("./routes/auth.routes");
+
+
+const {
+	queryDispatcher,
+	sparqlQuery,
+} = require("./controllers/SPARQLQueryDispatcher");
+
+var propertiesData = require('./utils/data')
 var app = express();
+
+const searchRoute = require("./routes/propertyValue");
+
+app.use(express.static(__dirname + "/public/views"));
+
+
+app.use('/property-value', searchRoute);
+
 
 app.use(cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const searchRoute = require("./routes/propertyValue");
-const authRoute = require("./routes/auth.routes");
+
 
 app.use(express.static(__dirname + "/public/views"));
 
+app.use("/items", listofitemsRouter);
 app.use("/property-value", searchRoute);
 app.use("/api/v1/auth", authRoute);
 
 app.use(notFound);
 app.use(errorHandlerMiddleware); //make sure very routes is above this middleware
 
+
 app.listen(process.env.PORT || 8000, function () {
   console.log("Node.js app listening on port 8000!");
+
 });
