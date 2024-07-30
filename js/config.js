@@ -1,8 +1,9 @@
 var config = {};
 
-config.session_secret = "generate some random value here";
-config.consumer_key = "the consumer token value from your OAuth consumer registration";
-config.consumer_secret = "the secret token value from your OAuth consumer registration";
+config.session_secret = process.env.SESSION_SECRET;
+config.consumer_key = process.env.MEDIAWIKI_CONSUMER_KEY;
+config.consumer_secret = process.env.MEDIAWIKI_CONSUMER_SECRET;
+config.callback = process.env.MEDIAWIKI_CALLBACK_URL;
 config.SPARKQLEndPointUrl = "https://query.wikidata.org/sparql";
 config.wikiDataUrl = "https://www.wikidata.org/w/api.php";
 config.sparqlQuery = `#Items with a Wikispecies sitelink
