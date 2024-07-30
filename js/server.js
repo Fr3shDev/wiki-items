@@ -37,7 +37,6 @@ const {
 var propertiesData = require('./utils/data')
 var app = express();
 
-const searchRoute = require("./routes/propertyValue");
 
 app.use(express.static(__dirname + "/public/views"));
 
