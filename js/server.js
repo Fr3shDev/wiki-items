@@ -28,94 +28,52 @@ var config = require("./config");
 const { updateWikidataItem, getCSRFToken } = require('./wikidata.js');
 
 
-var app = express();
-var router = express.Router();
+require("dotenv").config();
+const notFound = require("./exception-handlers/not-found");
+const errorHandlerMiddleware = require("./exception-handlers/error-handler");
+var express = require("express");
+const cors = require("cors");
 
-app.set("views", __dirname + "/public/views");
-app.set("view engine", "ejs");
+const listofitemsRouter = require("./routes/itemsApi");
+const searchRoute = require("./routes/propertyValue");
+const authRoute = require("./routes/auth.routes");
+
+
+const {
+	queryDispatcher,
+	sparqlQuery,
+} = require("./controllers/SPARQLQueryDispatcher");
+
+var propertiesData = require('./utils/data')
+var app = express();
+
+
 app.use(express.static(__dirname + "/public/views"));
 
-app.use(passport.initialize());
-app.use(passport.session());
 
-app.use(
-	session({
-		secret: config.session_secret,
-		saveUninitialized: true,
-		resave: true,
-	}),
-);
+app.use('/property-value', searchRoute);
 
-app.use("/", router);
 
-passport.use(
-	new MediaWikiStrategy(
-		{
-			consumerKey: config.consumer_key,
-			consumerSecret: config.consumer_secret,
-		},
-		function (token, tokenSecret, profile, done) {
-			profile.oauth = {
-				consumer_key: config.consumer_key,
-				consumer_secret: config.consumer_secret,
-				token: token,
-				token_secret: tokenSecret,
-			};
-			return done(null, profile);
-		},
-	),
-);
+app.use(cors());
 
-passport.serializeUser(function (user, done) {
-	done(null, user);
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-passport.deserializeUser(function (obj, done) {
-	done(null, obj);
-});
 
-router.get("/", function (req, res) {
-	res.render("index", {
-		user: req && req.session && req.session.user,
-		url: req.baseUrl,
-	});
-});
 
-router.get("/login", function (req, res) {
-	res.redirect(req.baseUrl + "/oauth-callback");
-});
+app.use(express.static(__dirname + "/public/views"));
 
-router.get("/oauth-callback", function (req, res, next) {
-	passport.authenticate("mediawiki", function (err, user) {
-		if (err) {
-			return next(err);
-		}
+app.use("/items", listofitemsRouter);
+app.use("/property-value", searchRoute);
+app.use("/api/v1/auth", authRoute);
 
-		if (!user) {
-			return res.redirect(req.baseUrl + "/login");
-		}
+app.use(notFound);
+app.use(errorHandlerMiddleware); //make sure very routes is above this middleware
 
-		req.logIn(user, function (err) {
-			if (err) {
-				return next(err);
-			}
-			req.session.user = user;
-			res.redirect(req.baseUrl + "/");
-		});
-	})(req, res, next);
-});
-
-router.get("/logout", function (req, res) {
-	delete req.session.user;
-	res.redirect(req.baseUrl + "/");
-});
 
 
 
 app.listen(process.env.PORT || 8000, function () {
-	console.log("Node.js app listening on port 8000!");
+  console.log("Node.js app listening on port 8000!");
+
 });
-
-
-
-
