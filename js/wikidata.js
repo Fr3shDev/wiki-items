@@ -66,30 +66,3 @@ async function getCSRFToken() {
 updateWikidataItem('Q4115189', 'P1', 'City');
 
 
-// async function main() {
-//   try {
-//     const csrfToken = await getCSRFToken();
-
-//     //example usage
-//     const itemId = 'Q123';
-//     const property = 'P456';
-//     const newPropertyValue = {
-//       "mainsnak": {
-//         "snaktype": value,
-//         "property": propertyId,
-//         "datavalue": {
-//           "value": "New property value",
-//           "type": "string"
-//         }
-//       },
-//       "type": "statement",
-//       "rank": "normal"
-//     };
-
-//     const result = await updateItemProperty(itemId, property, newPropertyValue, csrfToken);
-//     console.log(result);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
-// main();

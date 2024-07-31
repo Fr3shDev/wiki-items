@@ -19,7 +19,7 @@
 
 */
 
-var express = require("express");
+var express = require ("express");
 var session = require("express-session");
 var passport = require("passport");
 var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
@@ -110,17 +110,7 @@ router.get("/logout", function (req, res) {
 	res.redirect(req.baseUrl + "/");
 });
 
-router.get('/api/data', async (req, res) => {
-	try {
-	  // Call the updateItemProperty function
-	  const result = await updateItemProperty(123, 456, 789, 'my_csrf_token');
-	  res.json(result);
-	} catch (error) {
-	  // Handle any errors that occur during the data fetch
-	  console.error('Error fetching data:', error);
-	  res.status(500).json({ error: 'An error occurred while fetching data' });
-	}
-});
+
 
 app.listen(process.env.PORT || 8000, function () {
 	console.log("Node.js app listening on port 8000!");
