@@ -1,3 +1,5 @@
+const config = require('../config');
+
 // const fetch = require('node-fetch');
 const getFetch = async () => {
   const { default: fetch } = await import('node-fetch');
@@ -7,7 +9,7 @@ const getFetch = async () => {
 const fetch = getFetch();
 
 async function updateWikidataItem(itemId, propertyId, value) {
-  const apiUrl = 'https://www.wikidata.org/w/api.php';
+  const apiUrl = config.wikiDataUrl;
   const csrfToken = await getCSRFToken();
 
   const claim = {
@@ -46,7 +48,7 @@ async function updateWikidataItem(itemId, propertyId, value) {
 }
 
 async function getCSRFToken() {
-  const apiUrl = 'https://www.wikidata.org/w/api.php';
+  const apiUrl = config.wikiDataUrl;
   const requestBody = new URLSearchParams({
     action: 'query',
     meta: 'tokens',
