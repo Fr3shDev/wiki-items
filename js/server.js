@@ -18,6 +18,16 @@
  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 */
+
+var express = require ("express");
+var session = require("express-session");
+var passport = require("passport");
+var MediaWikiStrategy = require("passport-mediawiki-oauth").OAuthStrategy;
+var config = require("./config");
+
+const { updateWikidataItem, getCSRFToken } = require('./wikidata.js');
+
+
 require("dotenv").config();
 const notFound = require("./exception-handlers/not-found");
 const errorHandlerMiddleware = require("./exception-handlers/error-handler");
@@ -59,6 +69,8 @@ app.use("/api/v1/auth", authRoute);
 
 app.use(notFound);
 app.use(errorHandlerMiddleware); //make sure very routes is above this middleware
+
+
 
 
 app.listen(process.env.PORT || 8000, function () {
