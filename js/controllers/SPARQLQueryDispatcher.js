@@ -41,6 +41,43 @@ const queryWikidata = async (ids) => {
 	}
 };
 
+const cleanWikidataEntity = (entity) => {
+	// Extract the title and label
+	const title = entity.id || "";
+	const label = entity.labels?.en?.value || "";
+
+	// Extract the description
+	const description = entity.descriptions?.en?.value || "";
+
+	// Extract the image URL (if available)
+	let image = null;
+	if (entity.claims?.P18) {
+		const imageClaims = entity.claims.P18;
+		if (imageClaims.length > 0) {
+			image = imageClaims[0].mainsnak.datavalue.value;
+		}
+	}
+
+	// Collect other claims
+	const others = {};
+	for (const prop in entity.claims) {
+		if (prop !== "P18") {
+			// Exclude the image property
+			others[prop] = entity.claims[prop].map(
+				(claim) => claim.mainsnak.datavalue.value,
+			);
+		}
+	}
+
+	return JSON.stringify({
+		title,
+		label,
+		image,
+		description,
+		others,
+	});
+}
+
 const fetchItems = async () => {
 	return await querySPARQL(config.SPARKQLEndPointUrl, config.sparqlQuery);
 };
@@ -50,4 +87,4 @@ const getEntities = async (ids) => {
 	return qData;
 };
 
-module.exports = { fetchItems, getEntities };
+module.exports = { fetchItems, getEntities, cleanWikidataEntity };
